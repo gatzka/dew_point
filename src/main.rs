@@ -19,6 +19,7 @@ fn main() {
     println!("VP : {}", h_pa.with(vapor_pressure(35.4_f64, temperature)));
 
     println!("Dew point buck: {}", celsius.with(dew_point(35.4_f64, temperature)));
+    println!("wet bulb temperature: {}", celsius.with(wet_bulb_temperature(35.4_f64, temperature)))
 
 }
 
@@ -49,4 +50,15 @@ fn dew_point(relative_air_humidity_percent: f64, temperature: ThermodynamicTempe
     .ln();
 
     ThermodynamicTemperature::new::<degree_celsius>( C * gamma / (B - gamma))
+}
+
+fn wet_bulb_temperature(relative_air_humidity_percent: f64, temperature: ThermodynamicTemperature) -> ThermodynamicTemperature {
+    ThermodynamicTemperature::new::<degree_celsius>(
+        temperature.get::<degree_celsius>() * (0.151977_f64 * (relative_air_humidity_percent + 8.313659_f64).powf(0.5)).atan()
+        + (temperature.get::<degree_celsius>()+ relative_air_humidity_percent).atan()
+        - (relative_air_humidity_percent - 1.676331_f64).atan()
+        + 0.00391838 * relative_air_humidity_percent.powf(1.5) * (0.023101_f64 * relative_air_humidity_percent).atan()
+        - 4.686035_f64
+    
+    )
 }
